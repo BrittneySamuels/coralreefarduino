@@ -26,7 +26,6 @@ float incomingTurb;
 String success;
 
 //Structure example to send data
-//Must match the receiver structure
 typedef struct struct_message {
     float temp;
     float wat;
@@ -81,16 +80,9 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
  //GLOBAL DEFINITIONS AND PORT IDENTIFICATIONS
     //Lights and Sound
     #define heater 23// port for Increase Temp 
-    #define decLight 13 // port for Decrease light(BLUE)
-    #define warnLight 19 //port for Warning Light (RED)
-    #define buzzer 18// port for the warning sound (BUZZER)
-    
+  
   //Water Level Sensor
-    #define waterPower 26  //Applies Power to sensor
-    #define waterSensor 39 //Collects analog reading
-    int waterVal = 0; //Initialize Water Level value storage
-    int highWaterCount = 0; //water counter for warnings (HIGH)
-    int lowWaterCount = 0; //water counter for warnings (LOW)
+     #define waterSensor 39 //Collects analog reading
 
     //temperature
     const int oneWireBus = 5;
@@ -104,7 +96,7 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
     //Water Pumps
     #define iFPower 14 //Powers the IN Flow water pump
     #define oFPower 27 //Powers the OUT Flow water pump
-    int waterMax = 900; //highest water level
+    int waterMax = 700; //highest water level
     int waterMin = 500; //lowest water level
 
 //pH sensor
@@ -123,14 +115,12 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
     float TDSCon = 0.000998859;
     float TDS = 0; 
     float factor = 33.85;
+    float TDSg = 0;
     
 void setup() {
   // Init Serial Monitor
   Serial.begin(115200);
-
-  //initialize pH module
- // phModule.begin();
-   
+ 
   // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_AP_STA);
 
@@ -165,10 +155,6 @@ void setup() {
 
 //Define OUTPUTS
 pinMode (heater, OUTPUT);
-pinMode (decLight, OUTPUT);
-pinMode (warnLight, OUTPUT);
-pinMode (buzzer, OUTPUT);
-pinMode (waterPower, OUTPUT);
 pinMode (iFPower, OUTPUT);
 pinMode (oFPower, OUTPUT);
 pinMode (13,OUTPUT); 
@@ -214,7 +200,6 @@ void loop() {
             if (temperature > tempMax)
             {
               digitalWrite(heater, LOW);  //Ensure the Temperature Increaser is OFF
-              digitalWrite(decLight, HIGH);  // Turn the Temperture Decreaser ON
               Serial.println("Water cooler ON");
                      
             }
@@ -222,7 +207,6 @@ void loop() {
        //Low Temperature
            if (temperature < tempMin)
            {
-              digitalWrite(decLight, LOW);  //Ensure the Temperature Decreaser is OFF
               digitalWrite(heater, HIGH);  // Turn the Temperture Increaser ON
               Serial.println("Water Heater is ON");
               Heater = 2500;
@@ -278,18 +262,22 @@ void loop() {
         avgValue+=buf[i];
       float phValue=(float)avgValue*5.0/1024/6; //convert the analog into millivolt
       phValue=3.5*phValue;
+      Serial.println("phValue:");
+      Serial.println(phValue);
 
 
 //TDS Readings
 
-    sensorValue = analogRead(sensorPin);
-    Voltage = sensorValue*5/1024.0; //Convert analog reading to Voltage
-    tds =(133.42*Voltage*Voltage*Voltage - 255.86*Voltage*Voltage + 857.39*Voltage)*0.5; //Convert voltage value to TDS value
-    TDS= tds * TDSCon;
-    tdsValue = factor + TDS;
+   sensorValue = analogRead(sensorPin);
+    Voltage = sensorValue*3.3/1024.0; //Convert analog reading to Voltage
+    tdsValue=(133.42*Voltage*Voltage*Voltage - 255.86*Voltage*Voltage + 857.39*Voltage)*0.5; //Convert voltage value to TDS value
+    TDSg = tdsValue * TDSCon;
+    //tdsValue = factor + TDS;
     //tdsValue = tds * TDSCon;
     Serial.println("TDS Value:");
-    Serial.println(TDS);
+    Serial.println(tdsValue);
+     Serial.println(Voltage);
+    Serial.println(sensorValue);
 
 //package readings to send
               

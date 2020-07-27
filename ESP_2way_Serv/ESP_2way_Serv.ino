@@ -10,8 +10,6 @@
 int tank_id = 1;
 
 // ACCESS POINT credentials
-//const char* ssidAP = "ESP32-Access-Point";
-//const char* passwordAP = "12345678";
 // Wi-Fi channel for the access point (must match the sender channel)
 #define CHAN_AP 1
 
@@ -21,9 +19,9 @@ int tank_id = 1;
 //Wifi and server setup
   const char* ssid = "Corals";
   const char* password = "coralconnect";
-  char* sensorData = "http://192.168.43.225:8081/sensordata";
-  char* activityLog = "http://192.168.43.225:8081/createActivityLog";
-  char* GetRequest = "http://192.168.43.225:8081/configurationsGet/?tankid=1";  
+  char* sensorData = "http://192.168.43.234:8081/sensordata";
+  char* activityLog = "http://192.168.43.234:8081/createActivityLog";
+  char* GetRequest = "http://192.168.43.234:8081/configurationsGet/?tankid=1";  
 
 
 // Define variables to store user readings to be sent
@@ -186,10 +184,6 @@ void setup()
      
   // Set device as a Wi-Fi Station  
   WiFi.mode(WIFI_AP_STA);
-
-   // Set device as an access point
-//  WiFi.softAP(ssidAP, passwordAP, CHAN_AP, true); 
-
 
   // Init ESP-NOW
   if (esp_now_init() != ESP_OK)
